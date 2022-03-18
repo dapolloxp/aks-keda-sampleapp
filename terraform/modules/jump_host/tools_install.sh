@@ -11,6 +11,7 @@ sudo apt-get update -y
 sudo apt-get install azure-cli
 
 # Install Kubectl
+
 sudo apt-get update && sudo apt-get install -y apt-transport-https gnupg2 curl
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
 echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list
@@ -18,6 +19,7 @@ sudo apt-get update -y
 sudo apt-get install -y kubectl
 
 # Install Helm
+
 curl https://baltocdn.com/helm/signing.asc | sudo apt-key add -
 sudo apt-get install apt-transport-https --yes
 echo "deb https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
@@ -30,16 +32,24 @@ sudo apt-get install helm -y
 wget https://packages.microsoft.com/config/ubuntu/18.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
 sudo dpkg -i packages-microsoft-prod.deb
 rm packages-microsoft-prod.deb
-
 sudo apt-get update;  sudo apt-get install -y apt-transport-https &&   sudo apt-get update &&   sudo apt-get install -y dotnet-sdk-3.1
-
 sudo apt-get update; sudo apt-get install -y apt-transport-https && sudo apt-get update && sudo apt-get install -y aspnetcore-runtime-3.1
-
+apt install unzip -y
 
 # Generate SSH key
 
 ssh-keygen -m PEM -t rsa -b 4096 -C "azureuser@myserver" -f /root/.ssh/id_rsa -N ""
 
+# push ssh key
 
 az login --identity
-az keyvault secret set --name test --vault-name $1 --file ~/.ssh/id_rsa.pub
+az keyvault secret set --name jumphostkey --vault-name $1 --file ~/.ssh/id_rsa.pub
+
+# download kubelogin and push to /bin directoy
+
+wget https://github.com/Azure/kubelogin/releases/download/v0.0.11/kubelogin-linux-amd64.zip
+unzip kubelogin-linux-amd64.zip
+chmod +x bin/linux_amd64/kubelogin
+cp bin/linux_amd64/kubelogin /bin
+#az aks get-credentials --name $2 --resource-group $3
+#kubectl get nodes >> test.txt

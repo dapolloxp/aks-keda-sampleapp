@@ -172,6 +172,7 @@ variable "jump_host_password" {
   sensitive = true
   type      = string
 }
+variable "aks_aad_rbac" {}
 
 
 

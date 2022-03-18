@@ -2,7 +2,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "2.93"
+      version = "2.99"
     }
   }
 }
@@ -238,7 +238,7 @@ module "aks" {
   ]
   acr_id       = module.acr.acr_id
   key_vault_id = module.hub_keyvault.kv_key_zone_id
-
+  azure_active_directory_role_based_access_control = var.aks_aad_rbac
 }
 
 

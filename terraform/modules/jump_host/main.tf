@@ -94,7 +94,7 @@ locals {
   # I
   kv_name = element(split("/", var.key_vault_id), length(split("/", var.key_vault_id)) - 1)
 }
-// element(split("/", key_vault_id),length(split("/", key_vault_id))-1)
+
 resource "azurerm_virtual_machine_extension" "Installdependancies" {
   name                 = "${var.jump_host_name}_vm_extension"
   virtual_machine_id   = azurerm_linux_virtual_machine.jump_host.id
@@ -104,7 +104,7 @@ resource "azurerm_virtual_machine_extension" "Installdependancies" {
   # "script":"${filebase64("${path.module}/tools_install.sh '${local.kv_name}'")}"
   protected_settings = <<PROTECTED_SETTINGS
     {
-      "commandToExecute": "./tools_install.sh ${local.kv_name}"
+      "commandToExecute": "./tools_install.sh ${local.kv_name} test-cluster aks-core-prod-eastus2-rg"
     }
     PROTECTED_SETTINGS
   settings           = <<SETTINGS
@@ -114,7 +114,8 @@ resource "azurerm_virtual_machine_extension" "Installdependancies" {
     }
     SETTINGS
   depends_on = [
-    azurerm_key_vault_access_policy.vm_key_access
+    azurerm_key_vault_access_policy.vm_key_access,
+    azurerm_role_assignment.aks_cluster_admin
   ]
 
 }
@@ -126,8 +127,27 @@ data "azurerm_subscription" "sub" {
 
 resource "azurerm_role_assignment" "vm_reader" {
   scope = data.azurerm_subscription.sub.id
-  //scope                  = tostring(join("",[data.azurerm_subscription.sub.id, "/ResourceGroups/",var.kv_rg]))
   role_definition_name = "Reader"
+  principal_id         = azurerm_linux_virtual_machine.jump_host.identity[0].principal_id
+  depends_on = [
+    azurerm_linux_virtual_machine.jump_host,
+    azurerm_key_vault_access_policy.vm_key_access
+  ]
+}
+
+resource "azurerm_role_assignment" "aks_cluster_admin" {
+  scope = data.azurerm_subscription.sub.id
+  role_definition_name = "Azure Kubernetes Service Cluster Admin Role"
+  principal_id         = azurerm_linux_virtual_machine.jump_host.identity[0].principal_id
+  depends_on = [
+    azurerm_linux_virtual_machine.jump_host,
+    azurerm_key_vault_access_policy.vm_key_access
+  ]
+}
+
+resource "azurerm_role_assignment" "aks_cluster_user" {
+  scope = data.azurerm_subscription.sub.id
+  role_definition_name = "Azure Kubernetes Service Cluster User Role"
   principal_id         = azurerm_linux_virtual_machine.jump_host.identity[0].principal_id
   depends_on = [
     azurerm_linux_virtual_machine.jump_host,
@@ -139,8 +159,6 @@ resource "azurerm_key_vault_access_policy" "vm_key_access" {
   key_vault_id = var.key_vault_id
   tenant_id    = data.azurerm_client_config.current.tenant_id
   object_id    = azurerm_linux_virtual_machine.jump_host.identity[0].principal_id
-  //object_id = data.azurerm_client_config.current.object_id
-  //application_id = azurerm_linux_virtual_machine.jump_host.identity[0].principal_id
   key_permissions = [
     "Get",
     "Create"

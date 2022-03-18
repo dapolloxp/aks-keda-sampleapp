@@ -44,3 +44,14 @@ variable "aks_dns_prefix" {
   description = "AKS Prefix Name"
   default     = "dapolina"
 }
+
+variable "azure_active_directory_role_based_access_control" {
+    type        = object({
+        enabled                = bool 
+        admin_group_object_ids = tuple([string])
+    })
+    default     = {
+        enabled                = false 
+        admin_group_object_ids = null 
+    }
+}
