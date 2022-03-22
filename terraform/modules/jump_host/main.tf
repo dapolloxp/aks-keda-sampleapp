@@ -110,7 +110,7 @@ resource "azurerm_virtual_machine_extension" "Installdependancies" {
   settings           = <<SETTINGS
     {
         
-        "fileUris": ["https://raw.githubusercontent.com/dapolloxp/aks-reference-architecture/main/terraform/modules/jump_host/tools_install.sh"]  
+        "fileUris": ["https://raw.githubusercontent.com/dapolloxp/aks-keda-sampleapp/main/terraform/modules/jump_host/tools_install.sh"]  
     }
     SETTINGS
   depends_on = [

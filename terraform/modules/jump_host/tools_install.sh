@@ -47,9 +47,9 @@ az keyvault secret set --name jumphostkey --vault-name $1 --file ~/.ssh/id_rsa.p
 
 # download kubelogin and push to /bin directoy
 
-wget https://github.com/Azure/kubelogin/releases/download/v0.0.11/kubelogin-linux-amd64.zip
-unzip kubelogin-linux-amd64.zip
-chmod +x bin/linux_amd64/kubelogin
-cp bin/linux_amd64/kubelogin /bin
+wget https://github.com/Azure/kubelogin/releases/download/v0.0.11/kubelogin-linux-amd64.zip -O /tmp/kubelogin-linux-amd64.zip
+unzip /tmp/kubelogin-linux-amd64.zip
+chmod +x /tmp/bin/linux_amd64/kubelogin
+mv /tmp/bin/linux_amd64/kubelogin /bin
 #az aks get-credentials --name $2 --resource-group $3
 #kubectl get nodes >> test.txt

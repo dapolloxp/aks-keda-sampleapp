@@ -71,6 +71,7 @@ resource "azurerm_kubernetes_cluster" "aks_c" {
     content {
       managed = var.azure_active_directory_role_based_access_control.enabled     
       admin_group_object_ids = var.azure_active_directory_role_based_access_control.admin_group_object_ids
+      azure_rbac_enabled = var.azure_active_directory_role_based_access_control.enabled
     }
   }
   
