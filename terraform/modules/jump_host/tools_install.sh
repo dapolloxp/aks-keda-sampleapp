@@ -43,7 +43,7 @@ ssh-keygen -m PEM -t rsa -b 4096 -C "azureuser@myserver" -f /root/.ssh/id_rsa -N
 # push ssh key
 
 az login --identity
-az keyvault secret set --name jumphostkey --vault-name $1 --file ~/.ssh/id_rsa.pub
+az keyvault secret set --name test --vault-name $1 --file ~/.ssh/id_rsa.pub
 
 # download kubelogin and push to /bin directoy
 
