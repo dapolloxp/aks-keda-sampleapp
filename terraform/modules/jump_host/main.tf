@@ -155,6 +155,16 @@ resource "azurerm_role_assignment" "aks_cluster_user" {
   ]
 }
 
+resource "azurerm_role_assignment" "aks_rbac_cluster_admin" {
+  scope = data.azurerm_subscription.sub.id
+  role_definition_name = "Azure Kubernetes Service RBAC Cluster Admin"
+  principal_id         = azurerm_linux_virtual_machine.jump_host.identity[0].principal_id
+  depends_on = [
+    azurerm_linux_virtual_machine.jump_host,
+    azurerm_key_vault_access_policy.vm_key_access
+  ]
+}
+
 resource "azurerm_key_vault_access_policy" "vm_key_access" {
   key_vault_id = var.key_vault_id
   tenant_id    = data.azurerm_client_config.current.tenant_id
