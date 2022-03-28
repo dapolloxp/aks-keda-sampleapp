@@ -31,6 +31,7 @@ You will be prompted for the following variables:
 If desired, you can create a file with the extension of tfvars, such as mysettings.tfvar, in the following structure:
 
 jump_host_password = "Your Secure Password"
+
 aks_aad_rbac = {
     enabled = true
     admin_group_object_ids = ["Object ID of your group/user"]
