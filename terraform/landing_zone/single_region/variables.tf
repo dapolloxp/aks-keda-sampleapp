@@ -1,9 +1,15 @@
+variable "rg-prefix" {
+  type        = string
+  description = "RG Prefix"
+  default     = "keda-demo"
+}
+
 variable "mon_resource_group_name" {
   type        = string
   description = "Azure monitoring Resource Group"
   default     = "mon-core-prod-rg"
 }
-
+# ${var.rg-prefix}-svc-core-prod-rg
 variable "svc_resource_group_name" {
   type        = string
   description = "Shared Services Resource Group"
@@ -51,60 +57,6 @@ variable "tags" {
   }
 }
 
-/*
-# Windows DC Variables
-variable "compute_boot_volume_size_in_gb" {
-  description = "Boot volume size of jumpbox instance"
-  default     = 128
-}
-
-variable "enable_accelerated_networking" {
-  default = "false"
-}
-
-variable "boot_diag_SA_endpoint" {
-  default = "0"
-}
-
-variable "os_offer" {
-  default = "WindowsServer"
-}
-
-variable "os_publisher" {
-  default = "MicrosoftWindowsServer"
-}
-
-variable "os_sku" {
-  default = "2019-Datacenter"
-}
-
-variable "os_version" {
-  default = "latest"
-}
-
-variable "admin_username" {
-  default = "sysadmin"
-}
-
-#variable "admin_password" {
-#}
-
-variable "storage_account_type" {
-  default = "Standard_LRS"
-}
-*/
-
-/*
-# DSC Variables
-variable dsc_config {
-  default = "blank"
-}
-
-variable dsc_mode {
-  default = "applyAndMonitor"
-}
-*/
-
 # Azure Bastion module
 variable "azurebastion_name_01" {
   type    = string
@@ -136,7 +88,6 @@ variable "azurefw_addr_prefix_r2" {
   default     = "10.2.254.0/24"
 }
 # ACR
-
 
 variable "acr_name" {
   type    = string
@@ -174,9 +125,6 @@ variable "jump_host_password" {
 }
 variable "aks_aad_rbac" {}
 
-
-
-
 # jumphost2
 
 
@@ -190,23 +138,3 @@ variable "jump_host_private_ip_addr2" {
   description = "Azure Jump Host Address"
   default     = "10.2.251.5"
 }
-/*
-variable "management_subscription_id" {
-    type        = string 
-    description = "Subscription Id for Managemnet subscription"
-    default = "51444e62-8fad-49fc-affe-dade00c18dd2"
-}
-
-variable "connectivity_subscription_id" {
-    type        = string 
-    description = "Subscription Id for Connectivity subscription"
-    default = "2ea80eb6-d4a4-44f8-9bbe-4b027ad71af3"
-}
-
-variable "identity_subscription_id" {
-    type        = string 
-    description = "Subscription Id for Identity subscription"
-    default = "962d4162-7af9-411f-8b1f-3269675d8766"
-}
-
-*/
