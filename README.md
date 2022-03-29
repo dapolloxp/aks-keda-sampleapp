@@ -42,22 +42,29 @@ terraform apply -f main.tf --var-file=mysettings.tfvars
 Once completed the following resource groups are created:
 
 * {prefix}-aks-core-prod-eastus2-rg
+
   This holds the AKS managed Identity, AKS Service, the AKS private DNS zone, and Service Bus.
 
 * {prefix}-mon-core-prod-eastus2-rg
+
   Contains the log analytics workspace.
 
 * {prefix}-net-aks-spk-eastus2-rg
+
   Contains the spoke VNETs and route tables.
   
 * {prefix}-net-core-hub-eastus2-rg
+
   This holds Azure Firewall, Azure Firewall policies, Bastion service, NSGs, Jumphost, Hub VNET, and associated IP groups.
 
 * {prefix}-shared-svc-spk-eastus2-rg
+
   Contains key vault and the associated private endpoint
   
 * {prefix}-svc-core-prod-rg
+
   contains the ACR DNS zone, service bus DNS zone, and Key vault zone.
 
-* AKS MC resource group (automatically created )
+* AKS MC resource group (automatically created)
+
   This is the default resource group created by AKS for Managed Identities, Node Pools, etc.
