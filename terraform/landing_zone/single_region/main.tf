@@ -71,6 +71,16 @@ module "hub_region1" {
   dns_servers = ["168.63.129.16"]
 }
 
+module "azure_storage" {
+  source = "../../modules/storage"
+  resource_group_name = azurerm_resource_group.hub_region1.name
+  location            = azurerm_resource_group.hub_region1.location
+  storageaccountname  = "${var.rg-prefix}${random_string.random.result}"
+  shared_subnetid =   module.id_spk_region1_default_subnet.subnet_id
+  azfiles_private_zone_id   = module.private_dns.azfiles_private_zone_id
+  azfiles_private_zone_name = module.private_dns.azfiles_private_zone_name
+}
+
 module "hub_region1_default_subnet" {
   source              = "../../modules/networking/subnet"
   resource_group_name = azurerm_resource_group.hub_region1.name

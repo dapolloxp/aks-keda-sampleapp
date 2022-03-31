@@ -151,3 +151,12 @@ resource "azurerm_role_assignment" "rbac_assignment_sub_managed_vm_c" {
   role_definition_name = "Virtual Machine Contributor"
   principal_id         = azurerm_kubernetes_cluster.aks_c.kubelet_identity[0].object_id
 }
+
+data "azurerm_client_config" "current" {}
+
+
+resource "azurerm_role_assignment" "aks_rbac_cluster_admin_current_user" {
+  scope = data.azurerm_subscription.current_sub.id
+  role_definition_name = "Azure Kubernetes Service RBAC Cluster Admin"
+  principal_id         = data.azurerm_client_config.current.object_id
+}

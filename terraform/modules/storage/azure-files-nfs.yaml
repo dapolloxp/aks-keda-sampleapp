@@ -1,0 +1,79 @@
+
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: azurefile-csi-nfs
+provisioner: file.csi.azure.com
+parameters:
+  protocol: nfs
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
+allowVolumeExpansion: true
+mountOptions:
+  - nconnect=8
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-azurefile
+spec:
+  capacity:
+    storage: 100Ti
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain  # if set as "Delete" file share would be removed in pvc deletion
+  mountOptions:
+    - nconnect=8
+  csi:
+    driver: file.csi.azure.com
+    readOnly: false
+    # make sure this volumeid is unique in the cluster
+    # `#` is not allowed in self defined volumeHandle
+    volumeHandle: unique-volumeid01
+    volumeAttributes:
+      resourceGroup: MC_dapol-aks-core-prod-eastus2-rg_test-cluster_eastus2 # optional, only set this when storage account is not in the same resource group as agent node
+      storageAccount: dapolinaazurefiles
+      shareName: test  # only file share name, don't use full path
+      protocol: nfs
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: pvc-azurefile
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 100Ti
+  volumeName: pv-azurefile
+  storageClassName: ""
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fio-tester-read
+  labels:
+    app: fio-testing-read
+spec:
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fio-testing-read
+  template:
+    metadata:
+      labels:
+        app: fio-testing-read
+    spec:
+      containers:
+      - name: fio-container
+        image: dapolinaacr01.azurecr.io/fiotools-aio:latest
+        ports:
+        - containerPort: 8000
+        volumeMounts:
+        - name: fio-data

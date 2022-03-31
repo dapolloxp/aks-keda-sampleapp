@@ -138,7 +138,7 @@ resource "azurerm_firewall_policy_rule_collection_group" "aks_rule_collection" {
         port = 443
       }
       source_ip_groups  = [var.region1_aks_spk_ip_g_id]
-      destination_fqdns = ["github.com", "raw.githubusercontent.com"]
+      destination_fqdns = ["github.com", "raw.githubusercontent.com", "gist.githubusercontent.com"]
     }
 
     rule {
