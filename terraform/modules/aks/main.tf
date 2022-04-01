@@ -31,7 +31,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "aks_spoke_link" {
 }
 
 data "azurerm_key_vault_secret" "kv_secret" {
-  name         = "test"
+  name         = "akssshkey"
   key_vault_id = var.key_vault_id
 }
 

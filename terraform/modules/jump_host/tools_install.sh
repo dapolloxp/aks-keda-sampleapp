@@ -10,6 +10,14 @@ echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO 
 sudo apt-get update -y
 sudo apt-get install azure-cli
 
+# install Docker
+
+apt install docker.io -y
+
+# Install jq
+
+apt install jq -y
+
 # Install Kubectl
 
 sudo apt-get update && sudo apt-get install -y apt-transport-https gnupg2 curl
@@ -43,7 +51,7 @@ ssh-keygen -m PEM -t rsa -b 4096 -C "azureuser@myserver" -f /root/.ssh/id_rsa -N
 # push ssh key
 
 az login --identity
-az keyvault secret set --name test --vault-name $1 --file ~/.ssh/id_rsa.pub
+az keyvault secret set --name akssshkey --vault-name $1 --file ~/.ssh/id_rsa.pub
 
 # download kubelogin and push to /bin directoy
 
