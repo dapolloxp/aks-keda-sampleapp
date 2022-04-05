@@ -44,7 +44,8 @@ resource "azurerm_kubernetes_cluster" "aks_c" {
   kubernetes_version = var.kubernetes_version
   identity {
     type                      = "UserAssigned"
-    user_assigned_identity_id = azurerm_user_assigned_identity.aks_master_identity.id
+  //  user_assigned_identity_id = azurerm_user_assigned_identity.aks_master_identity.id
+    identity_ids              = [azurerm_user_assigned_identity.aks_master_identity.id]
   }
   azure_policy_enabled = true
 

@@ -31,9 +31,9 @@ spec:
     # `#` is not allowed in self defined volumeHandle
     volumeHandle: unique-volumeid01
     volumeAttributes:
-      resourceGroup: MC_dapol-aks-core-prod-eastus2-rg_test-cluster_eastus2 # optional, only set this when storage account is not in the same resource group as agent node
-      storageAccount: dapolinaazurefiles
-      shareName: test  # only file share name, don't use full path
+      resourceGroup: dapol-net-core-hub-eastus2-rg # optional, only set this when storage account is not in the same resource group as agent node
+      storageAccount: dapolzvnrkyxba8vis
+      shareName: nfsshare  # only file share name, don't use full path
       protocol: nfs
 ---
 kind: PersistentVolumeClaim

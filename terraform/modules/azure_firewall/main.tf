@@ -32,6 +32,7 @@ resource "azurerm_firewall" "azure_firewall_instance" {
   resource_group_name = var.resource_group_name
   firewall_policy_id  = azurerm_firewall_policy.base_policy.id
   sku_tier = "Standard"
+  sku_name = "AZFW_VNet"
 
   ip_configuration {
     name                 = "configuration"
