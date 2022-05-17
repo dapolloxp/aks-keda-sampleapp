@@ -3,15 +3,15 @@ resource "azurerm_private_dns_zone" "keyvault_zone" {
   resource_group_name = var.resource_group_name
 }
 
-resource "azurerm_private_dns_zone" "azurefiles_zone" {
-  name                = "privatelink.file.core.windows.net"
+resource "azurerm_private_dns_zone" "azureblob_zone" {
+  name                = "privatelink.blob.core.windows.net"
   resource_group_name = var.resource_group_name
 }
 
-resource "azurerm_private_dns_zone_virtual_network_link" "azurefiles-hub-link" {
-  name                  = "azurefiles-zone-hub-link"
+resource "azurerm_private_dns_zone_virtual_network_link" "azureblob-hub-link" {
+  name                  = "azureblob-zone-hub-link"
   resource_group_name   = var.resource_group_name
-  private_dns_zone_name = azurerm_private_dns_zone.azurefiles_zone.name
+  private_dns_zone_name = azurerm_private_dns_zone.azureblob_zone.name
   virtual_network_id    = var.hub_virtual_network_id
 }
 

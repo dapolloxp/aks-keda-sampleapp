@@ -1,6 +1,6 @@
 
 resource "azurerm_private_dns_zone" "aks_dns_zone" {
-  name                = "privatelink.eastus2.azmk8s.io"
+  name                = "privatelink.${var.location}.azmk8s.io"
   resource_group_name = var.resource_group_name
 }
 
@@ -93,9 +93,13 @@ resource "azurerm_kubernetes_cluster" "aks_c" {
     vm_size             = var.machine_type
     node_count          = var.default_node_pool_size
     vnet_subnet_id      = var.aks_spoke_subnet_id
+   // os_disk_type = "Managed"
+   // os_sku = "Premium"
+  //  os_disk_size_gb = "1024"
     enable_auto_scaling = true
     max_count           = 10
     min_count           = 1
+    kubelet_disk_type   = "Temporary"
   }
   depends_on = [
     azurerm_role_assignment.aks_master_role_assignment,

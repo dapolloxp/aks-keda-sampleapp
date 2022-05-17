@@ -5,7 +5,7 @@ variable "spoke_virtual_network_id" {}
 variable "hub_virtual_network_id" {}
 variable "machine_type" {
   description = "The Azure Machine Type for the AKS Node Pool"
-  default     = "Standard_D4_v2"
+  default     = "standard_d8s_v3"
 }
 variable "service_cidr" {
   description = "Service CIDR"

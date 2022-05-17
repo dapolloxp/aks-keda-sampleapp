@@ -8,7 +8,7 @@ resource "azurerm_storage_account" "storage_account" {
   location                 = var.location
   account_tier             = "Premium"
   account_replication_type = "LRS"
-  account_kind = "FileStorage"
+  account_kind = "BlockBlobStorage"
   enable_https_traffic_only = false
   network_rules {
       bypass         = ["AzureServices"]
@@ -18,13 +18,13 @@ resource "azurerm_storage_account" "storage_account" {
     ]
   }
 }
-
+/*
 resource "azurerm_storage_share" "fileshare" {
   name                 = "nfsshare"
   storage_account_name = azurerm_storage_account.storage_account.name
   quota                = 102400
   enabled_protocol = "NFS"
-}
+}*/
 /*
 resource "azurerm_storage_share_directory" "nfsdir" {
   name                 = "nfsdirectory"
@@ -42,13 +42,14 @@ resource "azurerm_private_endpoint" "sa_pe" {
     name                           = "storageaccount-privateserviceconnection"
     private_connection_resource_id = azurerm_storage_account.storage_account.id
     is_manual_connection           = false
-    subresource_names              = ["file"]
+  //  subresource_names              = ["file"]
+    subresource_names              = ["blob"]
 
     
   }
   private_dns_zone_group {
-    name                 = var.azfiles_private_zone_name
-    private_dns_zone_ids = [var.azfiles_private_zone_id]
+    name                 = var.azblob_private_zone_name
+    private_dns_zone_ids = [var.azblob_private_zone_id]
   }
 }
 

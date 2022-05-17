@@ -2,12 +2,16 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "3.0.2"
+      version = "3.6.0"
     }
   }
 }
 provider "azurerm" {
-  features {}
+  features {
+     resource_group {
+       prevent_deletion_if_contains_resources = false
+     }
+   }
 }
 
 resource "random_string" "random" {
@@ -77,8 +81,8 @@ module "azure_storage" {
   location            = azurerm_resource_group.hub_region1.location
   storageaccountname  = "${var.rg-prefix}${random_string.random.result}"
   shared_subnetid =   module.id_spk_region1_default_subnet.subnet_id
-  azfiles_private_zone_id   = module.private_dns.azfiles_private_zone_id
-  azfiles_private_zone_name = module.private_dns.azfiles_private_zone_name
+  azblob_private_zone_id   = module.private_dns.azblob_private_zone_id
+  azblob_private_zone_name = module.private_dns.azblob_private_zone_name
 }
 
 module "hub_region1_default_subnet" {
@@ -272,7 +276,9 @@ resource "azurerm_route_table" "default_aks_route" {
     next_hop_type          = "VirtualAppliance"
     next_hop_in_ip_address = module.azure_firewall_region1.ip
   }
-
+  depends_on = [
+    module.azure_firewall_region1
+  ]
 }
 
 # Bastion Host

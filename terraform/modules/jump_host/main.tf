@@ -68,7 +68,8 @@ resource "azurerm_linux_virtual_machine" "jump_host" {
   os_disk {
     name                 = "${var.jump_host_name}-os-disk"
     caching              = "ReadWrite"
-    storage_account_type = "Standard_LRS"
+    storage_account_type = "Premium_LRS"
+    disk_size_gb = "2048"
   }
 
   identity {
