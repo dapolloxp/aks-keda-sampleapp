@@ -26,10 +26,11 @@ resource "azurerm_key_vault" "vault" {
     ]
 
   }
-
+  
   access_policy {
     tenant_id = data.azurerm_client_config.current.tenant_id
-    object_id = data.azurerm_client_config.current.object_id
+    //object_id = data.azurerm_client_config.current.object_id
+    object_id = "ba020750-47a8-496b-8206-551e1d062ffb"
     certificate_permissions = [
       "Backup",
       "Create",
@@ -94,9 +95,8 @@ resource "azurerm_key_vault" "vault" {
       "SetSAS",
       "Update"
     ]
-
   }
-
+  
 }
 
 

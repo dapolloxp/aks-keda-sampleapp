@@ -23,7 +23,7 @@ variable "servicebus-name" {
 
 variable "location" {
   type    = string
-  default = "eastus2"
+  default = "eastus"
 }
 
 variable "corp_prefix" {
@@ -41,7 +41,7 @@ variable "law_prefix" {
 
 
 variable "region1_loc" {
-  default = "eastus2"
+  default = "centralus"
 }
 
 variable "region2_loc" {
@@ -112,7 +112,7 @@ variable "jump_host_private_ip_addr" {
 variable "jump_host_vm_size" {
   type        = string
   description = "Azure Jump Host VM SKU"
-  default     = "Standard_DS3_v2"
+  default     = "Standard_D8ds_v4"
 }
 variable "jump_host_admin_username" {
   type        = string

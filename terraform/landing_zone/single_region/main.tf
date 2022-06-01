@@ -2,7 +2,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "3.6.0"
+      version = "3.8.0"
     }
   }
 }
@@ -23,8 +23,8 @@ resource "random_string" "random" {
 
 # Resource group 
 resource "azurerm_resource_group" "mon_rg" {
-  name     = "${var.rg-prefix}-mon-core-prod-${var.location}-rg"
-  location = var.location
+  name     = "${var.rg-prefix}-mon-core-prod-${var.region1_loc}-rg"
+  location = var.region1_loc
   tags = {
     "Workload"      = "Core Infra"
     "Data Class"    = "General"
@@ -33,8 +33,8 @@ resource "azurerm_resource_group" "mon_rg" {
 }
 
 resource "azurerm_resource_group" "aks_rg" {
-  name     = "${var.rg-prefix}-aks-core-prod-${var.location}-rg"
-  location = var.location
+  name     = "${var.rg-prefix}-aks-core-prod-${var.region1_loc}-rg"
+  location = var.region1_loc
   tags = {
     "Workload"      = "Core Infra"
     "Data Class"    = "General"
@@ -44,7 +44,7 @@ resource "azurerm_resource_group" "aks_rg" {
 
 resource "azurerm_resource_group" "svc_rg" {
   name     = "${var.rg-prefix}-svc-core-prod-rg"
-  location = var.location
+  location = var.region1_loc
   tags = {
     "Workload"      = "Core Infra"
     "Data Class"    = "General"
@@ -55,7 +55,7 @@ resource "azurerm_resource_group" "svc_rg" {
 module "log_analytics" {
   source              = "../../modules/log_analytics"
   resource_group_name = azurerm_resource_group.mon_rg.name
-  location            = var.location
+  location            = var.region1_loc
   law_name            = "${var.law_prefix}-core-${azurerm_resource_group.mon_rg.location}-${random_string.random.result}"
 }
 
@@ -219,7 +219,7 @@ module "peering_id_spk_Region1_2" {
 module "aks" {
   source                   = "../../modules/aks"
   resource_group_name      = azurerm_resource_group.aks_rg.name
-  location                 = var.location
+  location                 = var.region1_loc
   aks_spoke_subnet_id      = module.id_spk_region1_default_subnet.subnet_id
   hub_virtual_network_id   = module.hub_region1.vnet_id
   spoke_virtual_network_id = module.id_spk_region1.vnet_id
@@ -236,7 +236,7 @@ module "aks" {
 module "acr" {
   source              = "../../modules/acr"
   resource_group_name = azurerm_resource_group.aks_rg.name
-  location            = var.location
+  location            = var.region1_loc
   subnet_id           = module.id_spk_region1_default_subnet.subnet_id
   acr_name            = var.acr_name
   acr_private_zone_id = module.private_dns.acr_private_zone_id
@@ -246,14 +246,14 @@ module "acr" {
 module "private_dns" {
   source                 = "../../modules/azure_dns"
   resource_group_name    = azurerm_resource_group.svc_rg.name
-  location               = var.location
+  location               = var.region1_loc
   hub_virtual_network_id = module.hub_region1.vnet_id
 }
 
 module "service_bus" {
   source              = "../../modules/service_bus"
   resource_group_name = azurerm_resource_group.aks_rg.name
-  location            = var.location
+  location            = var.region1_loc
   sb-name             = var.servicebus-name
   sb_private_zone_id  = module.private_dns.sb_private_zone_id
   subnet_id           = module.id_spk_region1_default_subnet.subnet_id
@@ -262,14 +262,14 @@ module "service_bus" {
 module "keda_app" {
   source              = "../../modules/keda"
   resource_group_name = module.aks.node_resource_group
-  location            = var.location
+  location            = var.region1_loc
   sb_id               = module.service_bus.service_bus_id
 }
 
 resource "azurerm_route_table" "default_aks_route" {
   name                = "default_aks_route"
   resource_group_name = azurerm_resource_group.hub_region1.name
-  location            = var.location
+  location            = var.region1_loc
   route {
     name                   = "default_egress"
     address_prefix         = "0.0.0.0/0"

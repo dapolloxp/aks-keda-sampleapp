@@ -1,15 +1,15 @@
 ScalerManagedIdentity:
-  name: keda-identity
-  resourceID: /subscriptions/90376dc6-e4a0-49c3-930d-38ee8e2bafa4/resourcegroups/MC_aks-core-prod-eastus2-rg_test-cluster_eastus2/providers/Microsoft.ManagedIdentity/userAssignedIdentities/keda-identity
-  clientID: 57d635aa-c9f2-41f1-ae2d-6fbea97873a8
+  name: "keda-identity"
+  resourceID: "/subscriptions/90376dc6-e4a0-49c3-930d-38ee8e2bafa4/resourceGroups/MC_dapol-aks-core-prod-centralus-rg_test-cluster_centralus/providers/Microsoft.ManagedIdentity/userAssignedIdentities/keda-identity"
+  clientID: 0ae10dfe-be40-413e-a5ed-89986ffe7ebd
   namespace: keda
 
 ServiceBus:
-  hostName: dapolinasb10
+  hostName: dapolinasb15
   queue: orders
 
 ProcessorManagedIdentity:
   name: sb-processor-identity  
-  resourceID: "/subscriptions/90376dc6-e4a0-49c3-930d-38ee8e2bafa4/resourceGroups/MC_aks-core-prod-eastus2-rg_test-cluster_eastus2/providers/Microsoft.ManagedIdentity/userAssignedIdentities/sb-processor-identity"
-  clientID: 45f54eb7-82b1-4eb2-9c6b-f7475a4b7c6f
+  resourceID: "/subscriptions/90376dc6-e4a0-49c3-930d-38ee8e2bafa4/resourceGroups/MC_dapol-aks-core-prod-centralus-rg_test-cluster_centralus/providers/Microsoft.ManagedIdentity/userAssignedIdentities/sb-processor-identity"
+  clientID: 529ff862-a623-4291-97e7-bf3240325a0d
   namespace: keda-dotnet-sample

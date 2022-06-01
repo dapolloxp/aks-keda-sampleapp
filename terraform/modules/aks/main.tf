@@ -1,15 +1,15 @@
-
+/*
 resource "azurerm_private_dns_zone" "aks_dns_zone" {
   name                = "privatelink.${var.location}.azmk8s.io"
   resource_group_name = var.resource_group_name
-}
+}*/
 
 resource "azurerm_user_assigned_identity" "aks_master_identity" {
   name                = "aks-master-identity"
   resource_group_name = var.resource_group_name
   location            = var.location
 }
-
+/*
 resource "azurerm_role_assignment" "aks_master_role_assignment" {
   scope                = azurerm_private_dns_zone.aks_dns_zone.id
   role_definition_name = "Private DNS Zone Contributor"
@@ -21,14 +21,14 @@ resource "azurerm_private_dns_zone_virtual_network_link" "aks_hub_link" {
   resource_group_name   = var.resource_group_name
   private_dns_zone_name = azurerm_private_dns_zone.aks_dns_zone.name
   virtual_network_id    = var.hub_virtual_network_id
-}
-
+}*/
+/*
 resource "azurerm_private_dns_zone_virtual_network_link" "aks_spoke_link" {
   name                  = "aks-spoke-link"
   resource_group_name   = var.resource_group_name
   private_dns_zone_name = azurerm_private_dns_zone.aks_dns_zone.name
   virtual_network_id    = var.spoke_virtual_network_id
-}
+}*/
 
 data "azurerm_key_vault_secret" "kv_secret" {
   name         = "akssshkey"
@@ -76,8 +76,8 @@ resource "azurerm_kubernetes_cluster" "aks_c" {
     }
   }
   
-  private_cluster_enabled = true
-  private_dns_zone_id     = azurerm_private_dns_zone.aks_dns_zone.id
+//  private_cluster_enabled = true
+//  private_dns_zone_id     = azurerm_private_dns_zone.aks_dns_zone.id
 
   network_profile {
     network_plugin     = "azure"
@@ -85,7 +85,11 @@ resource "azurerm_kubernetes_cluster" "aks_c" {
     dns_service_ip     = var.dns_service_ip
     docker_bridge_cidr = var.docker_bridge_cidr
     load_balancer_sku  = "standard"
-    outbound_type      = "userDefinedRouting"
+   // outbound_type      = "userDefinedRouting"
+    outbound_type =  "userAssignedNATGateway"
+    nat_gateway_profile {
+      managed_outbound_ip_count = 16
+    }
   }
 
   default_node_pool {
@@ -100,9 +104,14 @@ resource "azurerm_kubernetes_cluster" "aks_c" {
     max_count           = 10
     min_count           = 1
     kubelet_disk_type   = "Temporary"
+    os_disk_type = "Ephemeral"
   }
+  /*
   depends_on = [
     azurerm_role_assignment.aks_master_role_assignment,
+  ]*/
+  depends_on = [
+    azurerm_nat_gateway.natgw
   ]
 }
 
@@ -114,7 +123,7 @@ resource "azurerm_role_assignment" "rbac_assignment" {
   role_definition_name = "AcrPull"
   principal_id         = azurerm_kubernetes_cluster.aks_c.kubelet_identity[0].object_id
 }
-
+/*
 resource "null_resource" "keda_install" {
   provisioner "local-exec" {
     when    = create
@@ -124,7 +133,7 @@ resource "null_resource" "keda_install" {
     az aks command invoke -g ${var.resource_group_name} -n ${azurerm_kubernetes_cluster.aks_c.name} -c "kubectl create namespace keda-dotnet-sample;"
   EOF
   }
-}
+}*/
 
 resource "azurerm_role_assignment" "rbac_assignment_sub_network_c" {
   scope                = data.azurerm_subscription.current_sub.id
@@ -163,5 +172,51 @@ data "azurerm_client_config" "current" {}
 resource "azurerm_role_assignment" "aks_rbac_cluster_admin_current_user" {
   scope = data.azurerm_subscription.current_sub.id
   role_definition_name = "Azure Kubernetes Service RBAC Cluster Admin"
-  principal_id         = data.azurerm_client_config.current.object_id
+ // principal_id         = data.azurerm_client_config.current.object_id
+ principal_id = "ba020750-47a8-496b-8206-551e1d062ffb"
+}
+
+
+## NAT GW specifics
+
+resource "azurerm_public_ip_prefix" "pipprefix" {
+  name                = "nat-gateway-publicIPPrefix"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  prefix_length       = 29
+  
+}
+
+
+resource "azurerm_subnet_nat_gateway_association" "natgwsubassoc" {
+  subnet_id      = var.aks_spoke_subnet_id
+  nat_gateway_id = azurerm_nat_gateway.natgw.id
+}
+
+resource "azurerm_nat_gateway_public_ip_prefix_association" "example" {
+  nat_gateway_id      = azurerm_nat_gateway.natgw.id
+  public_ip_prefix_id = azurerm_public_ip_prefix.pipprefix.id
+}
+
+resource "azurerm_nat_gateway" "natgw" {
+  name                    = "NAT-Gateway"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  #public_ip_address_ids   = [azurerm_public_ip.example.id]
+ # public_ip_prefix_ids    = [azurerm_public_ip_prefix.pipprefix.id]
+  sku_name                = "Standard"
+  idle_timeout_in_minutes = 4
+}
+
+resource "azurerm_public_ip" "pip" {
+  name                = "example-PIP"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  allocation_method   = "Static"
+  sku                 = "Standard"
+}
+
+resource "azurerm_nat_gateway_public_ip_association" "pipassoc" {
+  nat_gateway_id       = azurerm_nat_gateway.natgw.id
+  public_ip_address_id = azurerm_public_ip.pip.id
 }

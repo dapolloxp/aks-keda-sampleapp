@@ -13,7 +13,7 @@ resource "azurerm_servicebus_queue" "orders_queue" {
   namespace_id = azurerm_servicebus_namespace.sb_premium.id
   enable_partitioning = true
 }
-
+/*
 resource "azurerm_private_endpoint" "sb_pe" {
   name                = "sb-pe"
   resource_group_name = var.resource_group_name
@@ -36,3 +36,4 @@ resource "azurerm_private_endpoint" "sb_pe" {
     private_dns_zone_ids = [var.sb_private_zone_id]
   }
 }
+*/
