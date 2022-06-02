@@ -87,9 +87,11 @@ resource "azurerm_kubernetes_cluster" "aks_c" {
     load_balancer_sku  = "standard"
    // outbound_type      = "userDefinedRouting"
     outbound_type =  "userAssignedNATGateway"
+    
+    /*
     nat_gateway_profile {
       managed_outbound_ip_count = 16
-    }
+    }*/
   }
 
   default_node_pool {
@@ -111,7 +113,7 @@ resource "azurerm_kubernetes_cluster" "aks_c" {
     azurerm_role_assignment.aks_master_role_assignment,
   ]*/
   depends_on = [
-    azurerm_nat_gateway.natgw
+    azurerm_subnet_nat_gateway_association.natgwsubassoc
   ]
 }
 
@@ -176,7 +178,6 @@ resource "azurerm_role_assignment" "aks_rbac_cluster_admin_current_user" {
  principal_id = "ba020750-47a8-496b-8206-551e1d062ffb"
 }
 
-
 ## NAT GW specifics
 
 resource "azurerm_public_ip_prefix" "pipprefix" {
@@ -187,13 +188,12 @@ resource "azurerm_public_ip_prefix" "pipprefix" {
   
 }
 
-
 resource "azurerm_subnet_nat_gateway_association" "natgwsubassoc" {
   subnet_id      = var.aks_spoke_subnet_id
   nat_gateway_id = azurerm_nat_gateway.natgw.id
 }
 
-resource "azurerm_nat_gateway_public_ip_prefix_association" "example" {
+resource "azurerm_nat_gateway_public_ip_prefix_association" "natgwpredixassoc" {
   nat_gateway_id      = azurerm_nat_gateway.natgw.id
   public_ip_prefix_id = azurerm_public_ip_prefix.pipprefix.id
 }
@@ -201,13 +201,11 @@ resource "azurerm_nat_gateway_public_ip_prefix_association" "example" {
 resource "azurerm_nat_gateway" "natgw" {
   name                    = "NAT-Gateway"
   location            = var.location
-  resource_group_name = var.resource_group_name
-  #public_ip_address_ids   = [azurerm_public_ip.example.id]
- # public_ip_prefix_ids    = [azurerm_public_ip_prefix.pipprefix.id]
+  resource_group_name = var.resource_group_name 
   sku_name                = "Standard"
   idle_timeout_in_minutes = 4
 }
-
+/*
 resource "azurerm_public_ip" "pip" {
   name                = "example-PIP"
   location            = var.location
@@ -219,4 +217,4 @@ resource "azurerm_public_ip" "pip" {
 resource "azurerm_nat_gateway_public_ip_association" "pipassoc" {
   nat_gateway_id       = azurerm_nat_gateway.natgw.id
   public_ip_address_id = azurerm_public_ip.pip.id
-}
+}*/
