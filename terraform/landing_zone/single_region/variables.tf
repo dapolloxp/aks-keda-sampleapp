@@ -23,7 +23,7 @@ variable "servicebus-name" {
 
 variable "location" {
   type    = string
-  default = "eastus2"
+  default = "centralus"
 }
 
 variable "corp_prefix" {
@@ -41,7 +41,7 @@ variable "law_prefix" {
 
 
 variable "region1_loc" {
-  default = "eastus2"
+  default = "centralus"
 }
 
 variable "region2_loc" {
