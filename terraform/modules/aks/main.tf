@@ -40,11 +40,11 @@ resource "azurerm_kubernetes_cluster" "aks_c" {
   location            = var.location
   resource_group_name = var.resource_group_name
   dns_prefix          = var.aks_dns_prefix
-  sku_tier = "Paid"
+  sku_tier = "Free"
   kubernetes_version = var.kubernetes_version
+  disk_encryption_set_id = var.disk_encryption_set_id
   identity {
     type                      = "UserAssigned"
-  //  user_assigned_identity_id = azurerm_user_assigned_identity.aks_master_identity.id
     identity_ids              = [azurerm_user_assigned_identity.aks_master_identity.id]
   }
   azure_policy_enabled = true
@@ -99,7 +99,7 @@ resource "azurerm_kubernetes_cluster" "aks_c" {
     enable_auto_scaling = true
     max_count           = 10
     min_count           = 1
-    kubelet_disk_type   = "Temporary"
+    #kubelet_disk_type   = "Temporary"
   }
   depends_on = [
     azurerm_role_assignment.aks_master_role_assignment,
@@ -114,7 +114,7 @@ resource "azurerm_role_assignment" "rbac_assignment" {
   role_definition_name = "AcrPull"
   principal_id         = azurerm_kubernetes_cluster.aks_c.kubelet_identity[0].object_id
 }
-
+/*
 resource "null_resource" "keda_install" {
   provisioner "local-exec" {
     when    = create
@@ -125,7 +125,7 @@ resource "null_resource" "keda_install" {
   EOF
   }
 }
-
+*/
 resource "azurerm_role_assignment" "rbac_assignment_sub_network_c" {
   scope                = data.azurerm_subscription.current_sub.id
   role_definition_name = "Network Contributor"

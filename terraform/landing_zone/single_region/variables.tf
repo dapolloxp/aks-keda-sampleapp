@@ -1,7 +1,7 @@
 variable "rg-prefix" {
   type        = string
   description = "RG Prefix"
-  default     = "keda-demo"
+  default     = "anthosdemo"
 }
 
 variable "mon_resource_group_name" {
@@ -13,7 +13,7 @@ variable "mon_resource_group_name" {
 variable "svc_resource_group_name" {
   type        = string
   description = "Shared Services Resource Group"
-  default     = "svc-core-prod-rg"
+  default     = "svc-dns-rg"
 }
 
 variable "servicebus-name" {
@@ -123,7 +123,13 @@ variable "jump_host_password" {
   sensitive = true
   type      = string
 }
-variable "aks_aad_rbac" {}
+variable "aks_aad_rbac" {
+  //default = false
+  default     = {
+        enabled                = false 
+        admin_group_object_ids = null 
+    }
+}
 
 # jumphost2
 
@@ -137,4 +143,23 @@ variable "jump_host_private_ip_addr2" {
   type        = string
   description = "Azure Jump Host Address"
   default     = "10.2.251.5"
+}
+
+
+variable "des_name" {
+    type        = string 
+    description = "DES Name"
+    default = "desdes"
+}
+
+variable "des_key_name" {
+    type        = string 
+    description = "DES Name"
+    default = "akskey"
+}
+
+variable "des_kv_name" {
+    type        = string 
+    description = "DES KV Name"
+    default = "dapolinadeskv"
 }

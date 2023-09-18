@@ -2,7 +2,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "3.9.0"
+      version = "3.72.0"
     }
   }
 }
@@ -24,32 +24,17 @@ resource "random_string" "random" {
 # Resource group 
 resource "azurerm_resource_group" "mon_rg" {
   name     = "${var.rg-prefix}-mon-core-prod-${var.region1_loc}-rg"
-  location = var.region1_loc
-  tags = {
-    "Workload"      = "Core Infra"
-    "Data Class"    = "General"
-    "Business Crit" = "Low"
-  }
+  location = var.region1_loc  
 }
 
 resource "azurerm_resource_group" "aks_rg" {
   name     = "${var.rg-prefix}-aks-core-prod-${var.region1_loc}-rg"
-  location = var.region1_loc
-  tags = {
-    "Workload"      = "Core Infra"
-    "Data Class"    = "General"
-    "Business Crit" = "Low"
-  }
+  location = var.region1_loc  
 }
 
 resource "azurerm_resource_group" "svc_rg" {
-  name     = "${var.rg-prefix}-svc-core-prod-rg"
-  location = var.region1_loc
-  tags = {
-    "Workload"      = "Core Infra"
-    "Data Class"    = "General"
-    "Business Crit" = "High"
-  }
+  name     = "${var.rg-prefix}-net-pe-prod-rg"
+  location = var.region1_loc  
 }
 
 module "log_analytics" {
@@ -74,7 +59,7 @@ module "hub_region1" {
   address_space = "10.1.0.0/16"
   dns_servers = ["168.63.129.16"]
 }
-
+/*
 module "azure_storage" {
   source = "../../modules/storage"
   resource_group_name = azurerm_resource_group.hub_region1.name
@@ -83,7 +68,7 @@ module "azure_storage" {
   shared_subnetid =   module.id_spk_region1_default_subnet.subnet_id
   azblob_private_zone_id   = module.private_dns.azblob_private_zone_id
   azblob_private_zone_name = module.private_dns.azblob_private_zone_name
-}
+}*/
 
 module "hub_region1_default_subnet" {
   source              = "../../modules/networking/subnet"
@@ -93,6 +78,15 @@ module "hub_region1_default_subnet" {
   subnet_prefixes     = ["10.1.1.0/24"]
   azure_fw_ip         = module.azure_firewall_region1.ip
 }
+
+module "hub_region1_vpn_subnet" {
+  source              = "../../modules/networking/subnet_no_default_route"
+  resource_group_name = azurerm_resource_group.hub_region1.name
+  vnet_name           = module.hub_region1.vnet_name
+  subnet_name         = "default-subnet"
+  subnet_prefixes     = ["10.1.2.0/24"]
+}
+
 
 resource "azurerm_ip_group" "ip_g_region1_hub" {
   name                = "region1-hub-ipgroup"
@@ -216,6 +210,22 @@ module "peering_id_spk_Region1_2" {
   depends_on = [module.peering_aks_spk_Region1_1]
 }
 
+### disk encryption set
+
+module "disk_encryption_set" { 
+    source                    = "../../modules/azure_disk_encryption_set"
+    resource_group_name       = azurerm_resource_group.aks_rg.name
+    location                  = var.location
+    des_kv_name               = var.des_kv_name
+    des_key_name              = var.des_key_name
+    des_name                  = var.des_name 
+  #  local_ips                 = var.local_ips
+
+    depends_on = [
+      azurerm_resource_group.aks_rg
+    ]
+}
+
 module "aks" {
   source                   = "../../modules/aks"
   resource_group_name      = azurerm_resource_group.aks_rg.name
@@ -223,6 +233,7 @@ module "aks" {
   aks_spoke_subnet_id      = module.id_spk_region1_default_subnet.subnet_id
   hub_virtual_network_id   = module.hub_region1.vnet_id
   spoke_virtual_network_id = module.id_spk_region1.vnet_id
+  disk_encryption_set_id          = module.disk_encryption_set.id
   depends_on = [
     module.id_spk_region1_default_subnet,
     module.jump_host,
@@ -249,7 +260,7 @@ module "private_dns" {
   location               = var.region1_loc
   hub_virtual_network_id = module.hub_region1.vnet_id
 }
-
+/*
 module "service_bus" {
   source              = "../../modules/service_bus"
   resource_group_name = azurerm_resource_group.aks_rg.name
@@ -265,7 +276,7 @@ module "keda_app" {
   location            = var.region1_loc
   sb_id               = module.service_bus.service_bus_id
 }
-
+*/
 resource "azurerm_route_table" "default_aks_route" {
   name                = "default_aks_route"
   resource_group_name = azurerm_resource_group.hub_region1.name

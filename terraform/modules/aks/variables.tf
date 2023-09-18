@@ -5,7 +5,7 @@ variable "spoke_virtual_network_id" {}
 variable "hub_virtual_network_id" {}
 variable "machine_type" {
   description = "The Azure Machine Type for the AKS Node Pool"
-  default     = "standard_d8s_v3"
+  default     = "standard_d4s_v3"
 }
 variable "service_cidr" {
   description = "Service CIDR"
@@ -33,7 +33,7 @@ variable "default_node_pool_size" {
 
 variable "kubernetes_version" {
   description = "The Kubernetes version to use for the cluster."
-  default     = "1.21.7"
+  default     = "1.27.3"
 }
 
 variable "aks_cluster_name" {
@@ -54,4 +54,9 @@ variable "azure_active_directory_role_based_access_control" {
         enabled                = false 
         admin_group_object_ids = null 
     }
+}
+
+variable "disk_encryption_set_id" {
+    type        = string
+    description = "Disk Encryption Set ID"
 }
